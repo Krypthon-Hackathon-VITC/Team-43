@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import { InputText } from "primereact/inputtext";
 import Image from "next/image";
 import Link from "next/link";
 import { useAddress, useDisconnect, useMetamask } from "@thirdweb-dev/react";
@@ -22,6 +21,11 @@ const AdsNavbar = () => {
       label: "My Ads",
       icon: "pi pi-users",
       command: () => router.push("/ad"),
+    },
+    {
+      label: "Create Ads",
+      icon: "pi pi-images",
+      command: () => router.push("/ad/create"),
     },
     {
       label: "Sign Out",
@@ -48,6 +52,10 @@ const AdsNavbar = () => {
         <div className="flex items-center  gap-5">
           {address ? (
             <>
+              <Link href="/ad/all">
+                <i className="pi pi-globe !text-lg" />
+              </Link>
+
               <Button onClick={(e) => menu!.current!.toggle(e)} color="green">
                 {address.slice(0, 4)}...{address.slice(-4)}
               </Button>
