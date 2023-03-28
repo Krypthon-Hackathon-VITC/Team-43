@@ -5,6 +5,7 @@ const ViewAds = () => {
   return (
     <PageLayout title="Ad Manager" isAdPage>
       <p>Hello</p>
+      <p>Ads Page</p>
     </PageLayout>
   );
 };
