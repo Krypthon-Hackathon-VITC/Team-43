@@ -5,7 +5,8 @@ const nextConfig = {
     domains: ["ipfs.io"],
   },
   env: {
-    CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS,
+    BLOCKTUBE_CONTRACT_ADDRESS: process.env.BLOCKTUBE_CONTRACT_ADDRESS,
+    ADS_CONTRACT_ADDRESS: process.env.ADS_CONTRACT_ADDRESS,
   },
 };
 

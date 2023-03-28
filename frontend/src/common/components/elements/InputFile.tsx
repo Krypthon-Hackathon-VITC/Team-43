@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { IMAGE_TYPES } from "@utils/constants";
 import { FileUploadProps } from "primereact/fileupload";
 import { ipfsClient } from "@utils/ipfs-core";
+import { useStorageUpload } from "@thirdweb-dev/react";
 
 import { FilePond, registerPlugin } from "react-filepond";
 import type {
@@ -19,7 +20,7 @@ interface Props extends FileUploadProps {
   label?: string;
   required?: boolean;
   fileType?: string[];
-  getFileUrl?: (url: string) => void;
+  getFileUrl?: (value: any) => void;
 }
 
 registerPlugin(FilePondPluginFileValidateType);
@@ -34,6 +35,8 @@ const InputFile: React.FC<Props> = ({
   maxFileSize = 1000000,
   ...rest
 }) => {
+  const { mutateAsync: upload } = useStorageUpload();
+
   const { isSubmitting, setFieldValue } = useFormikContext();
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] =
@@ -67,13 +70,15 @@ const InputFile: React.FC<Props> = ({
               setFiles([file]);
 
               try {
+                const uri = await upload({ data: [file] });
+                const cid = uri[0].split("ipfs://")[1];
+                const url = `https://ipfs.thirdwebcdn.com/ipfs/${cid}`;
+
                 const client = await ipfsClient();
-                const { cid } = await client.add(file);
-                const url = `https://ipfs.io/ipfs/${cid}`;
-                getFileUrl?.(url);
+                const { cid: ipfsCid } = await client.add(file);
+                getFileUrl?.(ipfsCid);
                 setFieldValue(name, url);
 
-                console.log({ url });
                 load(url);
               } catch (error) {
                 console.log(error);

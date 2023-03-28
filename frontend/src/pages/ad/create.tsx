@@ -9,17 +9,17 @@ import { Steps } from "primereact/steps";
 import { CATEGORY_OPTIONS, VIDEO_TYPES } from "@utils/constants";
 import InputChips from "@components/elements/InputChips";
 import useContractWrite from "@hooks/useContractWrite";
+import { uuid } from "@utils/uuid";
 import { useRouter } from "next/router";
-import { useStore } from "@utils/store";
 import withAuth from "@hoc/withAuth";
 import SelectInput from "@components/elements/SelectInput";
-import { uuid } from "@utils/uuid";
 
 const initialValues = {
   title: "",
+  websiteLink: "",
   videoUrl: "",
-  thumbnailUrl: "",
   description: "",
+  category: "",
 };
 
 const schema = y.object().shape({
@@ -27,10 +27,10 @@ const schema = y.object().shape({
     .string()
     .max(100, "Title must be below 100 characters")
     .required("Title is required"),
+  websiteLink: y.string().required("Website Link is required"),
   videoUrl: y.string().required("Video is required"),
-  thumbnailUrl: y.string().required("Thumbnail is required"),
   description: y.string().required("Description is required"),
-  tags: y.array().min(1).required("Tags is required"),
+  category: y.string().required("Category is required"),
 });
 
 const items = [
@@ -38,38 +38,36 @@ const items = [
     label: "Upload Video",
   },
   {
-    label: "Upload Thumbnail",
-  },
-  {
     label: "Video Details",
   },
 ];
 
-const UploadVideo = () => {
+const CreateAds = () => {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [videoCid, setVideoCid] = useState("");
-  const { mutateAsync } = useContractWrite("uploadVideo");
-
-  const { isCreator } = useStore();
+  const { mutateAsync } = useContractWrite("uploadAdVideo", "blocktubeAds");
 
   return (
-    <PageLayout title="Upload Video" className="flex flex-col ">
+    <PageLayout title="Upload Video" className="flex flex-col " isAdPage>
       <Form
-        className="mt-5 bg-black p-2 sm:p-4 rounded-lg border"
+        className="mt-5 bg-black p-2 sm:p-4 rounded-lg"
         initialValues={initialValues}
         schema={schema}
         onSubmit={async (values) => {
-          const valuesInArray = Object.values(values);
-
           await mutateAsync(
-            [uuid(), ...valuesInArray, videoCid],
+            [
+              values.title,
+              values.websiteLink,
+              values.videoUrl,
+              values.description,
+              values.category,
+            ],
             "Video Uploaded"
           );
 
-          router.replace("/");
+          router.replace("/ad/profile");
         }}
-        submitButton={{ title: activeIndex === 2 ? "Upload" : "" }}
+        submitButton={{ title: activeIndex === 1 ? "Upload" : "" }}
       >
         <Steps
           model={items}
@@ -85,17 +83,8 @@ const UploadVideo = () => {
             accept="video/*"
             label="Upload your Video"
             name="videoUrl"
-            getFileUrl={(e) => setVideoCid(e)}
             fileType={VIDEO_TYPES}
             maxFileSize={100000000}
-            required
-          />
-        ) : activeIndex === 1 ? (
-          <InputFile
-            key="image"
-            accept="image/*"
-            label="Upload your Thumbnail"
-            name="thumbnailUrl"
             required
           />
         ) : (
@@ -103,7 +92,14 @@ const UploadVideo = () => {
             <Input
               label="Title"
               name="title"
-              placeholder="Enter your Title"
+              placeholder="Enter your title"
+              required
+            />
+
+            <Input
+              label="Website Link"
+              name="websiteLink"
+              placeholder="Enter your website link"
               required
             />
 
@@ -111,14 +107,6 @@ const UploadVideo = () => {
               label="Description"
               name="description"
               placeholder="Enter your Description"
-              required
-            />
-
-            <InputChips
-              label="Tags"
-              name="tags"
-              separator=","
-              placeholder="Education, Gaming"
               required
             />
 
@@ -135,4 +123,4 @@ const UploadVideo = () => {
   );
 };
 
-export default withAuth(UploadVideo, true);
+export default withAuth(CreateAds, false, "", true);

@@ -21,8 +21,6 @@ const UserSection: React.FC<Props & User> = ({
 }) => {
   const address = useAddress();
 
-  const { mutateAsync, isLoading } = useContractWrite("addSubscribe");
-
   const isUserProfile = address?.toLowerCase() === walletId?.toLowerCase();
 
   const isUserAlreadySubscribed = subscribers?.some(

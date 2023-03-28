@@ -2,6 +2,12 @@
 pragma solidity ^0.8.4;
 
 contract BlockTube {
+    struct VideoCID {
+        uint256 id;
+        string cid;
+        address owner;
+    }
+
     struct Channel {
         uint256 id;
         string username;
@@ -33,9 +39,11 @@ contract BlockTube {
 
     mapping(uint256 => Video) public videos;
     mapping(uint256 => Channel) public channels;
+    mapping(uint256 => VideoCID) public videoCids;
 
     uint256 public numberOfVideos = 0;
     uint256 public numberOfChannels = 0;
+    uint256 public numberOfVideoCids = 0;
 
     function getUserProfile(
         address _address
@@ -62,6 +70,16 @@ contract BlockTube {
         return allChannels;
     }
 
+    function getAllVideoCids() external view returns (VideoCID[] memory) {
+        VideoCID[] memory allVideoCids = new VideoCID[](numberOfVideoCids);
+
+        for (uint256 i = 0; i < numberOfChannels; i++) {
+            allVideoCids[i] = videoCids[i];
+        }
+
+        return allVideoCids;
+    }
+
     function uploadVideo(
         string memory uuid,
         string memory title,
@@ -69,7 +87,8 @@ contract BlockTube {
         string memory thumbnail,
         string memory description,
         string[] memory tags,
-        string memory category
+        string memory category,
+        string memory cid
     ) public {
         Video storage video = videos[numberOfVideos];
         Channel memory ChannelDetails;
@@ -95,6 +114,13 @@ contract BlockTube {
         video.profileImage = ChannelDetails.profileImage;
 
         numberOfVideos++;
+
+        VideoCID storage videoCid = videoCids[numberOfVideoCids];
+        videoCid.id = numberOfVideoCids;
+        videoCid.cid = cid;
+        videoCid.owner = msg.sender;
+
+        numberOfVideoCids++;
     }
 
     function createChannel(
@@ -133,6 +159,14 @@ contract BlockTube {
                 channels[i].coverImage = coverImg;
 
                 break;
+            }
+        }
+
+        for (uint256 i = 0; i < numberOfVideos; i++) {
+            if (videos[i].isDeleted == false && videos[i].owner == walletId) {
+                videos[i].username = username;
+                videos[i].channelName = channelName;
+                videos[i].profileImage = profileImg;
             }
         }
     }
@@ -205,6 +239,28 @@ contract BlockTube {
 
         for (uint256 i = 0; i < counter; i++) {
             if (videos[i].isDeleted == false) {
+                allVideos[i] = videos[i];
+            }
+        }
+
+        return allVideos;
+    }
+
+    function getChannelVideos(
+        address walletId
+    ) external view returns (Video[] memory) {
+        uint256 counter = 0;
+
+        for (uint256 i = 0; i < numberOfVideos; i++) {
+            if (videos[i].isDeleted == false && videos[i].owner == walletId) {
+                counter++;
+            }
+        }
+
+        Video[] memory allVideos = new Video[](counter);
+
+        for (uint256 i = 0; i < counter; i++) {
+            if (videos[i].isDeleted == false && videos[i].owner == walletId) {
                 allVideos[i] = videos[i];
             }
         }

@@ -13,20 +13,40 @@ import LoadingPage from "@components/LoadingPage";
 import { ConnectWalletPrompt } from "@components/ConnectWalletPage";
 
 const PageComponent = ({ Component, pageProps }: AppProps) => {
-  const { setMyProfile } = useStore();
+  const { setMyProfile, setMyAdProfile } = useStore();
   const address = useAddress();
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const { data } = useContractRead("getUserProfile", address);
+  const { data: userData } = useContractRead("getUserProfile", address);
+  const { data: adsManagerData } = useContractRead(
+    "getManagerProfile",
+    address,
+    "blocktubeAds"
+  );
 
   async function setMyProfileFunc() {
-    setMyProfile({ ...data }, () => setIsLoading(false));
+    setMyProfile({ ...userData });
+    setMyAdProfile({ ...adsManagerData }, () => setIsLoading(false));
   }
 
+  // useEffect(() => {
+  //   document.addEventListener("contextmenu", (e) => {
+  //     e.preventDefault();
+
+  //     return;
+  //   });
+
+  //   document.addEventListener("keydown", (e) => {
+  //     if (e.ctrlKey && e.shiftKey && e.key == "I") {
+  //       e.preventDefault();
+  //     }
+  //   });
+  // }, []);
+
   useEffect(() => {
-    if (data) setMyProfileFunc();
-  }, [data, address]);
+    if (userData && adsManagerData) setMyProfileFunc();
+  }, [userData, adsManagerData]);
 
   if (!address) return <ConnectWalletPrompt />;
 

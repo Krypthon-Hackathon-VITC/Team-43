@@ -5,7 +5,7 @@ contract BlockTubeAds {
     struct Manager {
         uint256 id;
         string companyName;
-        string profileImage;
+        string companyImg;
         address walletId;
     }
 
@@ -14,6 +14,7 @@ contract BlockTubeAds {
         uint256 id;
         string title;
         uint256 bidAmount;
+        uint256[] transactionHistory;
         string websiteLink;
         string videoUrl;
         string description;
@@ -54,7 +55,39 @@ contract BlockTubeAds {
         return allManager;
     }
 
-    function uploadVideo(
+    function getAllAdVideos() external view returns (Video[] memory) {
+        Video[] memory allVideos = new Video[](numberOfVideos);
+
+        for (uint256 i = 0; i < numberOfVideos; i++) {
+            allVideos[i] = videos[i];
+        }
+
+        return allVideos;
+    }
+
+    function getAdVideosByAddress(
+        address walletId
+    ) external view returns (Video[] memory) {
+        uint256 counter = 0;
+
+        for (uint256 i = 0; i < numberOfVideos; i++) {
+            if (videos[i].isDeleted == false && videos[i].owner == walletId) {
+                counter++;
+            }
+        }
+
+        Video[] memory allVideos = new Video[](counter);
+
+        for (uint256 i = 0; i < counter; i++) {
+            if (videos[i].isDeleted == false && videos[i].owner == walletId) {
+                allVideos[i] = videos[i];
+            }
+        }
+
+        return allVideos;
+    }
+
+    function uploadAdVideo(
         string memory title,
         string memory websiteLink,
         string memory videoUrl,
@@ -62,6 +95,7 @@ contract BlockTubeAds {
         string memory category
     ) public {
         Video storage video = videos[numberOfVideos];
+        uint256[] memory emptyInt;
 
         video.owner = msg.sender;
         video.id = numberOfVideos;
@@ -72,19 +106,20 @@ contract BlockTubeAds {
         video.description = description;
         video.category = category;
         video.isDeleted = false;
+        video.transactionHistory = emptyInt;
 
         numberOfVideos++;
     }
 
     function createManager(
         string memory companyName,
-        string memory profileImage
+        string memory companyImg
     ) external {
         Manager storage manager = managers[numberOfManagers];
 
         manager.id = numberOfManagers;
         manager.companyName = companyName;
-        manager.profileImage = profileImage;
+        manager.companyImg = companyImg;
         manager.walletId = msg.sender;
 
         numberOfManagers++;
@@ -99,6 +134,7 @@ contract BlockTubeAds {
 
         if (sent) {
             video.bidAmount += amount;
+            video.transactionHistory.push(amount);
         }
     }
 }

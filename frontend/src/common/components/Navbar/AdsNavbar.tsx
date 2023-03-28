@@ -18,9 +18,9 @@ const AdsNavbar = () => {
 
   const items: MenuItem[] = [
     {
-      label: "My Ads",
+      label: "My Profile",
       icon: "pi pi-users",
-      command: () => router.push("/ad"),
+      command: () => router.push("/ad/profile"),
     },
     {
       label: "Create Ads",
