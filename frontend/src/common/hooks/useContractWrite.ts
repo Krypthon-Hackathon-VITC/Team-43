@@ -13,7 +13,8 @@ export default function useContractWrite(
     | "addSubscribe"
     | "addLikes"
     | "createManager"
-    | "uploadAdVideo",
+    | "uploadAdVideo"
+    | "addViews",
   contractName: "blocktube" | "blocktubeAds" = "blocktube"
 ) {
   const contractAddress =
@@ -28,10 +29,15 @@ export default function useContractWrite(
     functionName
   );
 
-  const mutateAsync = async (values: any[], successMessage?: string) => {
+  const mutateAsync = async (
+    values: any[],
+    successMessage?: string,
+    cb?: () => void
+  ) => {
     try {
       const data = await mutateAsyncTW(values);
       if (successMessage) toast.success(successMessage);
+      cb?.();
       return data;
     } catch (err) {
       console.log("contract call failure :- ", err);

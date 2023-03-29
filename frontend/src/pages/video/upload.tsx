@@ -3,17 +3,20 @@ import InputFile from "@components/elements/InputFile";
 import TextArea from "@components/elements/Textarea";
 import Form from "@components/Form";
 import { PageLayout } from "@layouts/PageLayout";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import * as y from "yup";
 import { Steps } from "primereact/steps";
 import { CATEGORY_OPTIONS, VIDEO_TYPES } from "@utils/constants";
 import InputChips from "@components/elements/InputChips";
 import useContractWrite from "@hooks/useContractWrite";
 import { useRouter } from "next/router";
-import { useStore } from "@utils/store";
 import withAuth from "@hoc/withAuth";
 import SelectInput from "@components/elements/SelectInput";
 import { uuid } from "@utils/uuid";
+import useContractRead from "@hooks/useContractRead";
+import { Toast } from "primereact/toast";
+import { toast as toastRHT } from "react-hot-toast";
+import { MenuItem } from "primereact/menuitem";
 
 const initialValues = {
   title: "",
@@ -33,25 +36,36 @@ const schema = y.object().shape({
   tags: y.array().min(1).required("Tags is required"),
 });
 
-const items = [
-  {
-    label: "Upload Video",
-  },
-  {
-    label: "Upload Thumbnail",
-  },
-  {
-    label: "Video Details",
-  },
-];
-
 const UploadVideo = () => {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isVideoStatusSuccess, setIsVideoStatusSuccess] = useState(false);
   const [videoCid, setVideoCid] = useState("");
-  const { mutateAsync } = useContractWrite("uploadVideo");
+  const toast = useRef<Toast>(null);
 
-  const { isCreator } = useStore();
+  const items: MenuItem[] = [
+    {
+      label: "Upload Video",
+    },
+    {
+      label: "Upload Thumbnail",
+      disabled: !isVideoStatusSuccess,
+    },
+    {
+      label: "Video Details",
+      disabled: !isVideoStatusSuccess,
+    },
+  ];
+
+  const { mutateAsync } = useContractWrite("uploadVideo");
+  const { data } = useContractRead("getAllVideoCids");
+
+  const cids = data as {
+    cid: string;
+    owner: string;
+  }[];
+
+  console.log({ cids });
 
   return (
     <PageLayout title="Upload Video" className="flex flex-col ">
@@ -85,7 +99,23 @@ const UploadVideo = () => {
             accept="video/*"
             label="Upload your Video"
             name="videoUrl"
-            getFileUrl={(e) => setVideoCid(e)}
+            getFileUrl={(url) => {
+              setVideoCid(url);
+              const isVideoExist = cids.some((e) => e.cid === url);
+              const videoDetails = cids.find((e) => e.cid === url);
+
+              if (isVideoExist)
+                toast.current?.show({
+                  severity: "error",
+                  summary: "Video Found",
+                  detail: `This video has been owned by ${videoDetails?.owner}`,
+                  life: 3000,
+                });
+              else {
+                toastRHT.success("Uploaded to IPFS");
+                setIsVideoStatusSuccess(true);
+              }
+            }}
             fileType={VIDEO_TYPES}
             maxFileSize={100000000}
             required
@@ -131,6 +161,8 @@ const UploadVideo = () => {
           </Form.Row>
         )}
       </Form>
+
+      <Toast ref={toast} />
     </PageLayout>
   );
 };

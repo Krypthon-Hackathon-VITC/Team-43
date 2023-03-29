@@ -1,10 +1,10 @@
 import React from "react";
 import { Component } from "types/components";
-import { Video } from "types/video";
 import VideoCard from "./Card";
 import { Skeleton } from "primereact/skeleton";
 import clsx from "clsx";
 import { AdVideo } from "types/ad";
+import { ethers } from "ethers";
 
 const ContainerWrapper: React.FC<Component & { small: boolean }> = ({
   className,
@@ -44,7 +44,11 @@ type Props = {
   small?: boolean;
 };
 
-const AdContainer: React.FC<Props> = ({ ads, isLoading, small = false }) => {
+const AdContainer: React.FC<Props> = ({
+  ads = [],
+  isLoading,
+  small = false,
+}) => {
   if (isLoading)
     return (
       <ContainerWrapper small={small}>
@@ -55,6 +59,15 @@ const AdContainer: React.FC<Props> = ({ ads, isLoading, small = false }) => {
     );
 
   if (!ads) return <></>;
+
+  const _ads = ads.map((e) => ({
+    ...e,
+    bidAmount: parseFloat(ethers.utils.formatEther(e.bidAmount)),
+  }));
+
+  const sortedAds = _ads?.sort((a, b) => a.bidAmount - b.bidAmount);
+
+  console.log({ sortedAds });
 
   return (
     <ContainerWrapper small={small}>

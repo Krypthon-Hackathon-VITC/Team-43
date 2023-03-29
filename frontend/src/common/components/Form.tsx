@@ -72,7 +72,7 @@ const Form: React.FC<FormProps & React.FormHTMLAttributes<HTMLFormElement>> &
           {children}
 
           {(submitButton || resetButton) && (
-            <div className={clsx("flex mt-3 gap-x-4", actionClassName)}>
+            <div className={clsx("flex gap-x-4", actionClassName)}>
               {submitButton?.title && (
                 <Button
                   type="submit"

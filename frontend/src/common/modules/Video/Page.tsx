@@ -4,9 +4,11 @@ import useContractRead from "@hooks/useContractRead";
 import useContractWrite from "@hooks/useContractWrite";
 import { useAddress } from "@thirdweb-dev/react";
 import clsx from "clsx";
+import { ethers } from "ethers";
 import Link from "next/link";
 import { Button } from "primereact/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { AdVideo, AdVideoProps } from "types/ad";
 import { User } from "types/user";
 import { Video } from "types/video";
 import {
@@ -17,12 +19,15 @@ import {
   ForwardControl,
 } from "video-react";
 import "video-react/dist/video-react.css";
+import AdVideoPlayer from "./AdVideoPlayer";
 
 type Props = {
   isLoading: boolean;
+  ads: AdVideo[];
 };
 
 const VideoPage: React.FC<Props & Video> = ({
+  ads,
   title,
   thumbnailUrl,
   videoUrl,
@@ -32,22 +37,59 @@ const VideoPage: React.FC<Props & Video> = ({
   owner,
   views,
   isLoading,
+  category,
   id,
 }) => {
   const address = useAddress();
   const [showDescription, setShowDescription] = useState(false);
+  const [isAdSkipped, setIsAdSkipped] = useState(false);
+  const [displaySkipBtn, setDisplaySkipBtn] = useState(false);
+  const [isUserPaidFee, setIsUserPaidFee] = useState(false);
 
   const { data, isLoading: isUserProfileLoading } = useContractRead(
     "getUserProfile",
     owner
   );
 
+  const { mutateAsync: addViews } = useContractWrite("addViews");
   const { mutateAsync: addLikes } = useContractWrite("addLikes");
+
+  async function addViewsToTheVideo() {
+    try {
+      await addViews([id], "", () => {
+        setIsUserPaidFee(true);
+      });
+    } catch (error) {}
+  }
+
+  useEffect(() => {
+    if (id) addViewsToTheVideo();
+  }, [isLoading]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setDisplaySkipBtn(true);
+    }, 5000);
+  }, []);
 
   if (isLoading) return <LoadingPage className="!h-full flex-1" size="small" />;
 
-  if (isUserProfileLoading || !data)
+  if (isUserProfileLoading)
     return <LoadingPage className="!h-full flex-1" size="small" />;
+
+  if (!title)
+    return (
+      <div>
+        <h3 className="text-center">Video not found</h3>
+      </div>
+    );
+
+  if (!isUserPaidFee)
+    return (
+      <div>
+        <p className="text-center">Waiting for transaction</p>
+      </div>
+    );
 
   const user = data as User;
 
@@ -55,20 +97,33 @@ const VideoPage: React.FC<Props & Video> = ({
     address?.toLowerCase() === user?.walletId?.toLowerCase();
 
   const isUserLikedTheVideo = likes.some((e) => e === address);
-  console.log({ isUserLikedTheVideo });
 
   return (
     <div className="w-full grid place-items-center">
       <div className="bg-black w-full grid place-items-center">
-        <div className="w-full 2xl:w-[60%]">
-          <Player poster={thumbnailUrl} src={videoUrl} aspectRatio="16:9">
-            <BigPlayButton className="!hidden" />
+        <div className="relative w-full 2xl:w-[60%]">
+          {!isAdSkipped ? (
+            <>
+              <AdVideoPlayer {...{ category, owner, ads }} />
+              <Button
+                className="z-50 !absolute top-2 right-2"
+                severity="info"
+                onClick={() => setIsAdSkipped(true)}
+                disabled={!displaySkipBtn}
+              >
+                Skip
+              </Button>
+            </>
+          ) : (
+            <Player poster={thumbnailUrl} src={videoUrl} aspectRatio="16:9">
+              <BigPlayButton className="!hidden" />
 
-            <ControlBar>
-              <ReplayControl seconds={5} />
-              <ForwardControl seconds={5} />
-            </ControlBar>
-          </Player>
+              <ControlBar>
+                <ReplayControl seconds={5} />
+                <ForwardControl seconds={5} />
+              </ControlBar>
+            </Player>
+          )}
         </div>
       </div>
 
@@ -133,6 +188,8 @@ const VideoPage: React.FC<Props & Video> = ({
               />
             </div>
           </div>
+
+          <p>{views.length}</p>
 
           <p
             onClick={(e) => setShowDescription(!showDescription)}

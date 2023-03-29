@@ -11,7 +11,8 @@ export default function useContractRead(
     | "getChannel"
     | "getManagerProfile"
     | "getAdVideosByAddress"
-    | "getAllAdVideos",
+    | "getAllAdVideos"
+    | "getAllVideoCids",
   value?: any,
   contractName: "blocktube" | "blocktubeAds" = "blocktube"
 ) {

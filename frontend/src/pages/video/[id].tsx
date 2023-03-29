@@ -9,10 +9,15 @@ const ViewVideo = () => {
   const id = router.query?.id;
 
   const { data, isLoading } = useContractRead("getVideo", id);
+  const { data: ads, isLoading: isAdsLoading } = useContractRead(
+    "getAllAdVideos",
+    null,
+    "blocktubeAds"
+  );
 
   return (
     <PageLayout title="Video" className="flex flex-col !p-0">
-      <VideoPage isLoading={isLoading} {...data} />
+      <VideoPage isLoading={isLoading && isAdsLoading} ads={ads} {...data} />
     </PageLayout>
   );
 };

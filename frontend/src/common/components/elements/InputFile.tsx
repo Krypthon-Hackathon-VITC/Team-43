@@ -76,7 +76,7 @@ const InputFile: React.FC<Props> = ({
 
                 const client = await ipfsClient();
                 const { cid: ipfsCid } = await client.add(file);
-                getFileUrl?.(ipfsCid);
+                getFileUrl?.(ipfsCid.toString());
                 setFieldValue(name, url);
 
                 load(url);

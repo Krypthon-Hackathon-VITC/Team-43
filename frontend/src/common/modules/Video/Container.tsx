@@ -1,6 +1,6 @@
 import React from "react";
 import { Component } from "types/components";
-import { Video } from "types/video";
+import { Video, VideoProps } from "types/video";
 import VideoCard from "./Card";
 import { Skeleton } from "primereact/skeleton";
 import clsx from "clsx";
@@ -39,7 +39,7 @@ const VideoLoadingSkeleton = () => (
 
 type Props = {
   isLoading?: boolean;
-  videos: Video[];
+  videos: VideoProps[];
   small?: boolean;
 };
 

@@ -28,7 +28,7 @@ contract BlockTube {
         string description;
         string[] tags;
         string category;
-        uint256 views;
+        address[] views;
         address[] likes;
         address[] dislikes;
         bool isDeleted;
@@ -105,7 +105,7 @@ contract BlockTube {
         video.description = description;
         video.tags = tags;
         video.category = category;
-        video.views = 0;
+        video.views = emptyAddress;
         video.likes = emptyAddress;
         video.dislikes = emptyAddress;
         video.isDeleted = false;
@@ -286,10 +286,8 @@ contract BlockTube {
         videos[videoId].description = description;
     }
 
-    function addViews(uint256 id) public returns (bool result) {
-        videos[id].views = videos[id].views + 1;
-
-        return true;
+    function addViews(uint256 id) public {
+        videos[id].views.push(msg.sender);
     }
 
     function addLikes(uint256 id) public returns (Video memory result) {

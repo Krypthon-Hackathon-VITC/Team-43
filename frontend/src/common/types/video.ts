@@ -8,9 +8,10 @@ export type Video = {
   title: string;
   videoUrl: string;
   thumbnailUrl: string;
-  views: any;
+  views: string[];
   likes: string[];
   dislikes: string[];
+  category: string;
 };
 
 export type VideoProps = Video & User;
