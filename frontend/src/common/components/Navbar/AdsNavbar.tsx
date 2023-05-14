@@ -59,6 +59,7 @@ const AdsNavbar = () => {
               <Button onClick={(e) => menu!.current!.toggle(e)} color="green">
                 {address.slice(0, 4)}...{address.slice(-4)}
               </Button>
+
               <Menu className="mt-1" model={items} popup ref={menu} />
             </>
           ) : (

@@ -1,7 +1,6 @@
-import useContractRead from "@hooks/useContractRead";
+import { useContractReadVal } from "@hooks/useContractRead";
 import { ethers } from "ethers";
 import Link from "next/link";
-import { Button } from "primereact/button";
 import React from "react";
 import { AdVideo } from "types/ad";
 
@@ -13,7 +12,7 @@ type Props = {
 
 const AdVideoPlayer: React.FC<Props> = ({ owner, ads = [], category }) => {
   const { data: adOwnerProfile, isLoading: isAdOwnerProfileLoading } =
-    useContractRead("getManagerProfile", owner, "blocktubeAds");
+    useContractReadVal("getManagerProfile", "blocktubeAds", owner);
 
   if (isAdOwnerProfileLoading) return <></>;
 

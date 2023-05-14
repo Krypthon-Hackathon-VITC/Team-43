@@ -1,14 +1,13 @@
 import SubscribeButton from "@components/elements/SubscribeButton";
 import LoadingPage from "@components/LoadingPage";
-import useContractRead from "@hooks/useContractRead";
+import { useContractReadVal } from "@hooks/useContractRead";
 import useContractWrite from "@hooks/useContractWrite";
 import { useAddress } from "@thirdweb-dev/react";
 import clsx from "clsx";
-import { ethers } from "ethers";
 import Link from "next/link";
 import { Button } from "primereact/button";
 import React, { useEffect, useState } from "react";
-import { AdVideo, AdVideoProps } from "types/ad";
+import { AdVideo } from "types/ad";
 import { User } from "types/user";
 import { Video } from "types/video";
 import {
@@ -32,7 +31,6 @@ const VideoPage: React.FC<Props & Video> = ({
   thumbnailUrl,
   videoUrl,
   description,
-  dislikes,
   likes,
   owner,
   views,
@@ -46,8 +44,9 @@ const VideoPage: React.FC<Props & Video> = ({
   const [displaySkipBtn, setDisplaySkipBtn] = useState(false);
   const [isUserPaidFee, setIsUserPaidFee] = useState(false);
 
-  const { data, isLoading: isUserProfileLoading } = useContractRead(
+  const { data, isLoading: isUserProfileLoading } = useContractReadVal(
     "getUserProfile",
+    "blocktube",
     owner
   );
 
@@ -67,10 +66,13 @@ const VideoPage: React.FC<Props & Video> = ({
   }, [isLoading]);
 
   useEffect(() => {
-    setTimeout(() => {
-      setDisplaySkipBtn(true);
-    }, 5000);
-  }, []);
+    if (isUserPaidFee)
+      setTimeout(() => {
+        setDisplaySkipBtn(true);
+      }, 5000);
+  }, [isUserPaidFee]);
+
+  console.log({ displaySkipBtn });
 
   if (isLoading) return <LoadingPage className="!h-full flex-1" size="small" />;
 
@@ -79,15 +81,15 @@ const VideoPage: React.FC<Props & Video> = ({
 
   if (!title)
     return (
-      <div>
+      <div className="h-screen grid place-content-center">
         <h3 className="text-center">Video not found</h3>
       </div>
     );
 
   if (!isUserPaidFee)
     return (
-      <div>
-        <p className="text-center">Waiting for transaction</p>
+      <div className="h-screen grid place-content-center">
+        <p className="text-center">Waiting for transaction...</p>
       </div>
     );
 
@@ -106,7 +108,7 @@ const VideoPage: React.FC<Props & Video> = ({
             <>
               <AdVideoPlayer {...{ category, owner, ads }} />
               <Button
-                className="z-50 !absolute top-2 right-2"
+                className="z-40 !absolute top-2 right-2"
                 severity="info"
                 onClick={() => setIsAdSkipped(true)}
                 disabled={!displaySkipBtn}
@@ -189,20 +191,22 @@ const VideoPage: React.FC<Props & Video> = ({
             </div>
           </div>
 
-          <p>{views.length}</p>
+          <span>{views.length} views</span>
 
-          <p
-            onClick={(e) => setShowDescription(!showDescription)}
-            className={clsx(
-              "whitespace-pre-line",
-              !showDescription && "line-clamp-1 cursor-pointer"
-            )}
-          >
-            {description}
-          </p>
+          <div>
+            <h5>Description</h5>
+
+            <p
+              onClick={() => setShowDescription(!showDescription)}
+              className={clsx(
+                "whitespace-pre-line",
+                !showDescription && "line-clamp-2 cursor-pointer"
+              )}
+            >
+              {description}
+            </p>
+          </div>
         </div>
-
-        <div></div>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import type { AppProps } from "next/app";
 import { ThirdwebProvider, useAddress } from "@thirdweb-dev/react";
 import { Toaster } from "react-hot-toast";
 import "primeicons/primeicons.css";
-import useContractRead from "@hooks/useContractRead";
+import { useContractReadVal } from "@hooks/useContractRead";
 import { useEffect, useState } from "react";
 import { useStore } from "@utils/store";
 import LoadingPage from "@components/LoadingPage";
@@ -18,11 +18,15 @@ const PageComponent = ({ Component, pageProps }: AppProps) => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const { data: userData } = useContractRead("getUserProfile", address);
-  const { data: adsManagerData } = useContractRead(
+  const { data: userData } = useContractReadVal(
+    "getUserProfile",
+    "blocktube",
+    address
+  );
+  const { data: adsManagerData } = useContractReadVal(
     "getManagerProfile",
-    address,
-    "blocktubeAds"
+    "blocktubeAds",
+    address
   );
 
   async function setMyProfileFunc() {
@@ -48,9 +52,9 @@ const PageComponent = ({ Component, pageProps }: AppProps) => {
     if (userData && adsManagerData) setMyProfileFunc();
   }, [userData, adsManagerData]);
 
-  if (!address) return <ConnectWalletPrompt />;
-
   if (isLoading) return <LoadingPage />;
+
+  if (!address) return <ConnectWalletPrompt />;
 
   return (
     <>

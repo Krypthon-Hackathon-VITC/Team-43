@@ -48,7 +48,9 @@ const AdCard: React.FC<Props> = ({
       <div className="grid gap-2 place-items-start">
         <h4 className="line-clamp-2">{title}</h4>
 
-        <p className="text-sm font-bold text-gray-500 truncate">{owner}</p>
+        <p className="w-full text-sm font-bold text-gray-500 truncate">
+          {owner}
+        </p>
 
         <div className="w-full flex justify-between">
           <Link href={websiteLink} target="_blank" className="hover:underline">

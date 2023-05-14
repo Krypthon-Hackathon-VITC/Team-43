@@ -79,7 +79,7 @@ const InputFile: React.FC<Props> = ({
                 getFileUrl?.(ipfsCid.toString());
                 setFieldValue(name, url);
 
-                load(url);
+                load([url]);
               } catch (error) {
                 console.log(error);
               }

@@ -26,7 +26,7 @@ const TopNavbar = () => {
     {
       label: "Ad Manager",
       icon: "pi pi-users",
-      command: () => router.push("/ad"),
+      command: () => router.push("/ad/profile"),
     },
     {
       label: "Sign Out",

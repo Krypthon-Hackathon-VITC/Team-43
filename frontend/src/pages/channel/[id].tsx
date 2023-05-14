@@ -1,4 +1,4 @@
-import useContractRead from "@hooks/useContractRead";
+import { useContractReadVal } from "@hooks/useContractRead";
 import { PageLayout } from "@layouts/PageLayout";
 import ProfilePage from "@modules/Channel";
 import { useStore } from "@utils/store";
@@ -11,7 +11,11 @@ const ViewChannel = () => {
   const router = useRouter();
   const name = `${router.query?.id}`.split("@")[1];
 
-  const { data, isLoading } = useContractRead("getChannel", name);
+  const { data, isLoading } = useContractReadVal(
+    "getChannel",
+    "blocktube",
+    name
+  );
 
   console.log({ data });
 

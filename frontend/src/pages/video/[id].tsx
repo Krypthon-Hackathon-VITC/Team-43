@@ -1,4 +1,4 @@
-import useContractRead from "@hooks/useContractRead";
+import { useContractRead, useContractReadVal } from "@hooks/useContractRead";
 import { PageLayout } from "@layouts/PageLayout";
 import React from "react";
 import VideoPage from "@modules/Video/Page";
@@ -8,10 +8,9 @@ const ViewVideo = () => {
   const router = useRouter();
   const id = router.query?.id;
 
-  const { data, isLoading } = useContractRead("getVideo", id);
+  const { data, isLoading } = useContractReadVal("getVideo", "blocktube", id);
   const { data: ads, isLoading: isAdsLoading } = useContractRead(
     "getAllAdVideos",
-    null,
     "blocktubeAds"
   );
 

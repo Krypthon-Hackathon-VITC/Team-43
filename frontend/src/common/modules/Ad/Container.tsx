@@ -1,6 +1,6 @@
 import React from "react";
 import { Component } from "types/components";
-import VideoCard from "./Card";
+import AdCard from "./Card";
 import { Skeleton } from "primereact/skeleton";
 import clsx from "clsx";
 import { AdVideo } from "types/ad";
@@ -16,7 +16,7 @@ const ContainerWrapper: React.FC<Component & { small: boolean }> = ({
       "grid grid-cols-1 gap-5",
       small
         ? "sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6"
-        : "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5",
+        : "md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5",
       className
     )}
   >
@@ -72,7 +72,7 @@ const AdContainer: React.FC<Props> = ({
   return (
     <ContainerWrapper small={small}>
       {ads.map((video) => (
-        <VideoCard key={video.id.toString()} {...video} />
+        <AdCard key={video.id.toString()} {...video} />
       ))}
     </ContainerWrapper>
   );

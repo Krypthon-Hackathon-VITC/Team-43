@@ -6,8 +6,8 @@ import UserSection from "@modules/Channel/UserSection";
 import { InternalCreatorForm } from "pages/creator";
 import LoadingPage from "@components/LoadingPage";
 import VideoContainer from "@modules/Video/Container";
-import useContractRead from "@hooks/useContractRead";
-import { Video } from "types/video";
+import { useContractRead } from "@hooks/useContractRead";
+import { VideoProps } from "types/video";
 
 const ProfilePage = ({
   user,
@@ -42,7 +42,7 @@ const ProfilePage = ({
     walletId,
   };
 
-  const videos = data as Video[];
+  const videos = data as VideoProps[];
 
   return (
     <div className="grid gap-4">
@@ -51,7 +51,6 @@ const ProfilePage = ({
       <VideoContainer
         isLoading={isVideoLoading}
         videos={videos?.filter((e) => e.owner === walletId)}
-        small
       />
 
       <Dialog

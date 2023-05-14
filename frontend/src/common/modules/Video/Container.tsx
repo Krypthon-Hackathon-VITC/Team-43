@@ -1,9 +1,10 @@
 import React from "react";
 import { Component } from "types/components";
-import { Video, VideoProps } from "types/video";
+import { VideoProps } from "types/video";
 import VideoCard from "./Card";
 import { Skeleton } from "primereact/skeleton";
 import clsx from "clsx";
+import useContractWrite from "@hooks/useContractWrite";
 
 const ContainerWrapper: React.FC<Component & { small: boolean }> = ({
   className,
@@ -59,12 +60,12 @@ const VideoContainer: React.FC<Props> = ({
 
   if (!videos) return <></>;
 
-  console.log({ videos });
+  const { mutateAsync: deleteVideo } = useContractWrite("deleteVideo");
 
   return (
     <ContainerWrapper small={small}>
       {videos.map((video) => (
-        <VideoCard key={video.uuid} {...video} />
+        <VideoCard key={video.uuid} deleteVideo={deleteVideo} {...video} />
       ))}
     </ContainerWrapper>
   );

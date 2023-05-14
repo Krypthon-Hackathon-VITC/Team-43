@@ -35,8 +35,8 @@ const UserSection: React.FC<Props & User> = ({
         alt={`Cover Image | ${channelName}`}
       />
 
-      <div className="p-4 w-full flex items-center justify-between">
-        <div className="flex items-center gap-5">
+      <div className="p-4 w-full flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row items-center gap-5">
           {profileImage ? (
             <img
               src={profileImage}
@@ -47,7 +47,7 @@ const UserSection: React.FC<Props & User> = ({
             <span className="w-24 h-24 rounded-full bg-gray-700" />
           )}
 
-          <div>
+          <div className="text-center md:text-left">
             <h2>{channelName}</h2>
 
             {channelName && (

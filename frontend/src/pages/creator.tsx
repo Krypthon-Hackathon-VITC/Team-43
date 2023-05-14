@@ -101,7 +101,7 @@ const CreatorPage = () => {
           await mutateAsync(valuesInArray, "You are now a CREATOR");
           router.replace("/channel/my");
         }}
-        submitButton={{ title: "Upload" }}
+        submitButton={{ title: "Create" }}
       />
     </PageLayout>
   );

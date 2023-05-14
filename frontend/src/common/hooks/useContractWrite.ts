@@ -14,7 +14,8 @@ export default function useContractWrite(
     | "addLikes"
     | "createManager"
     | "uploadAdVideo"
-    | "addViews",
+    | "addViews"
+    | "deleteVideo",
   contractName: "blocktube" | "blocktubeAds" = "blocktube"
 ) {
   const contractAddress =

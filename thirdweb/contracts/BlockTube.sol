@@ -2,12 +2,6 @@
 pragma solidity ^0.8.4;
 
 contract BlockTube {
-    struct VideoCID {
-        uint256 id;
-        string cid;
-        address owner;
-    }
-
     struct Channel {
         uint256 id;
         string username;
@@ -35,15 +29,16 @@ contract BlockTube {
         string username;
         string channelName;
         string profileImage;
+        uint amount;
     }
 
     mapping(uint256 => Video) public videos;
     mapping(uint256 => Channel) public channels;
-    mapping(uint256 => VideoCID) public videoCids;
 
     uint256 public numberOfVideos = 0;
     uint256 public numberOfChannels = 0;
-    uint256 public numberOfVideoCids = 0;
+
+    address BlockTubeOwner = 0xD579f98C47D4139EA8FCC0A5Ad71fc7c4604d17e;
 
     function getUserProfile(
         address _address
@@ -70,16 +65,6 @@ contract BlockTube {
         return allChannels;
     }
 
-    function getAllVideoCids() external view returns (VideoCID[] memory) {
-        VideoCID[] memory allVideoCids = new VideoCID[](numberOfVideoCids);
-
-        for (uint256 i = 0; i < numberOfChannels; i++) {
-            allVideoCids[i] = videoCids[i];
-        }
-
-        return allVideoCids;
-    }
-
     function uploadVideo(
         string memory uuid,
         string memory title,
@@ -87,8 +72,7 @@ contract BlockTube {
         string memory thumbnail,
         string memory description,
         string[] memory tags,
-        string memory category,
-        string memory cid
+        string memory category
     ) public {
         Video storage video = videos[numberOfVideos];
         Channel memory ChannelDetails;
@@ -112,15 +96,9 @@ contract BlockTube {
         video.username = ChannelDetails.username;
         video.channelName = ChannelDetails.channelName;
         video.profileImage = ChannelDetails.profileImage;
+        video.amount = 0;
 
         numberOfVideos++;
-
-        VideoCID storage videoCid = videoCids[numberOfVideoCids];
-        videoCid.id = numberOfVideoCids;
-        videoCid.cid = cid;
-        videoCid.owner = msg.sender;
-
-        numberOfVideoCids++;
     }
 
     function createChannel(
@@ -287,6 +265,14 @@ contract BlockTube {
     }
 
     function addViews(uint256 id) public {
+        uint256 amount = 0.00001e18;
+
+        (bool sent, ) = payable(BlockTubeOwner).call{value: amount}("");
+
+        if (sent) {
+            videos[id].amount += amount;
+        }
+
         videos[id].views.push(msg.sender);
     }
 

@@ -13,9 +13,7 @@ import { useRouter } from "next/router";
 import withAuth from "@hoc/withAuth";
 import SelectInput from "@components/elements/SelectInput";
 import { uuid } from "@utils/uuid";
-import useContractRead from "@hooks/useContractRead";
 import { Toast } from "primereact/toast";
-import { toast as toastRHT } from "react-hot-toast";
 import { MenuItem } from "primereact/menuitem";
 
 const initialValues = {
@@ -40,7 +38,6 @@ const UploadVideo = () => {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isVideoStatusSuccess, setIsVideoStatusSuccess] = useState(false);
-  const [videoCid, setVideoCid] = useState("");
   const toast = useRef<Toast>(null);
 
   const items: MenuItem[] = [
@@ -58,14 +55,6 @@ const UploadVideo = () => {
   ];
 
   const { mutateAsync } = useContractWrite("uploadVideo");
-  const { data } = useContractRead("getAllVideoCids");
-
-  const cids = data as {
-    cid: string;
-    owner: string;
-  }[];
-
-  console.log({ cids });
 
   return (
     <PageLayout title="Upload Video" className="flex flex-col ">
@@ -74,10 +63,16 @@ const UploadVideo = () => {
         initialValues={initialValues}
         schema={schema}
         onSubmit={async (values) => {
-          const valuesInArray = Object.values(values);
-
           await mutateAsync(
-            [uuid(), ...valuesInArray, videoCid],
+            [
+              uuid(),
+              values.title,
+              values.videoUrl,
+              values.thumbnailUrl,
+              values.description,
+              values.tags,
+              values.category,
+            ],
             "Video Uploaded"
           );
 
@@ -99,24 +94,11 @@ const UploadVideo = () => {
             accept="video/*"
             label="Upload your Video"
             name="videoUrl"
-            getFileUrl={(url) => {
-              setVideoCid(url);
-              const isVideoExist = cids.some((e) => e.cid === url);
-              const videoDetails = cids.find((e) => e.cid === url);
-
-              if (isVideoExist)
-                toast.current?.show({
-                  severity: "error",
-                  summary: "Video Found",
-                  detail: `This video has been owned by ${videoDetails?.owner}`,
-                  life: 3000,
-                });
-              else {
-                toastRHT.success("Uploaded to IPFS");
-                setIsVideoStatusSuccess(true);
-              }
-            }}
             fileType={VIDEO_TYPES}
+            getFileUrl={(url) => {
+              console.log({ url });
+              setIsVideoStatusSuccess(true);
+            }}
             maxFileSize={100000000}
             required
           />
