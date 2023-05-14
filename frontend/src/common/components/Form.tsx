@@ -113,4 +113,9 @@ Form.Grid = ({ className, children }) => (
   <div className={clsx("grid gap-5 sm:grid-cols-2", className)}>{children}</div>
 );
 
+Form.Grid.displayName = "Grid";
+
+Form.Row.displayName = "Row";
+
+Form.displayName = "Form";
 export default Form;
